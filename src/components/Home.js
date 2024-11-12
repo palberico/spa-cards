@@ -4,6 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import {
   Box,
   Typography,
+  TextField,
   Table,
   TableBody,
   TableCell,
@@ -18,7 +19,7 @@ import Header from "./Header";
 
 function Home() {
   const [cards, setCards] = useState([]);
-  const [search] = useState("");
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
@@ -31,16 +32,24 @@ function Home() {
     fetchCards();
   }, []);
 
-  const filteredCards = cards.filter(
-    (card) =>
-      card.cert_number?.includes(search) ||
-      card.player?.toLowerCase().includes(search.toLowerCase())
+  // Filtered cards based on search input
+  const filteredCards = cards.filter((card) =>
+    Object.values(card).some(
+      (value) =>
+        typeof value === "string" &&
+        value.toLowerCase().includes(search.toLowerCase())
+    )
   );
 
   const paginatedCards = filteredCards.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1); // Reset to the first page after each new search input
+  };
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
@@ -53,22 +62,32 @@ function Home() {
       {/* Introductory Text */}
       <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Certificate Verification
+          Cert Verification
         </Typography>
-        <Typography variant="body1" align="center" sx={{ maxWidth: 600, mb: 1 }}>
-          Verify the validity of SPA certification numbers using the search field above, 
-          or by scrolling through our datbase below. Always confirm certification numbers 
-          for collectibles purchased online after receipt.
+        <Typography variant="body1" align="center" sx={{ maxWidth: 600, mb: 2 }}>
+          Verify the validity of SPA certification numbers using the search field above, or filter
+          our database in the field below. Always confirm certification numbers for collectibles 
+          purchased online after receipt.
         </Typography>
+
+        {/* Search Field */}
+        <TextField
+          label="Search by any field (e.g., player, certificate number)"
+          variant="outlined"
+          fullWidth
+          value={search}
+          onChange={handleSearchChange}
+          sx={{ maxWidth: 600, mb: 3 }}
+        />
       </Box>
 
       {/* Table with Cards */}
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell></TableCell> {/* Front Image Column */}
-              <TableCell>Cert #</TableCell>
+              <TableCell>Certificate Number</TableCell>
               <TableCell>Sport</TableCell>
               <TableCell>Player</TableCell>
               <TableCell>Year</TableCell>
