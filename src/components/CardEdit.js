@@ -40,9 +40,9 @@ function CardEdit() {
 
   const confirmUpdate = async () => {
     const cardRef = doc(db, "cards", searchId);
+    const updatedData = { ...cardData };
 
     // Upload new images if changed
-    const updatedData = { ...cardData };
     if (imageFront instanceof File) {
       const frontRef = ref(storage, `cards/${searchId}_front`);
       await uploadBytes(frontRef, imageFront);
@@ -54,7 +54,6 @@ function CardEdit() {
       updatedData.imageBack = await getDownloadURL(backRef);
     }
 
-    // Update card data in Firestore
     await updateDoc(cardRef, updatedData);
     setSnackbarMessage("Card updated successfully.");
     setOpenSnackbar(true);
@@ -71,10 +70,7 @@ function CardEdit() {
     const backRef = ref(storage, `cards/${searchId}_back`);
     const qrCodeRef = ref(storage, `qr_codes/${searchId}_qrCode.png`);
 
-    // Delete Firestore document
     await deleteDoc(cardRef);
-
-    // Delete associated images and QR code from Storage
     await Promise.all([
       deleteObject(frontRef).catch(() => {}),
       deleteObject(backRef).catch(() => {}),
@@ -128,58 +124,41 @@ function CardEdit() {
             {cardData && (
               <Box mt={4}>
                 <Typography variant="h6" gutterBottom>Edit Card Details</Typography>
-                <TextField
-                  label="Label Type"
-                  name="label_type"
-                  value={cardData.label_type || ""}
-                  onChange={(e) => setCardData({ ...cardData, label_type: e.target.value })}
-                  fullWidth
-                  margin="normal"
-                />
-                <TextField
-                  label="Year"
-                  name="year"
-                  value={cardData.year || ""}
-                  onChange={(e) => setCardData({ ...cardData, year: e.target.value })}
-                  fullWidth
-                  margin="normal"
-                />
-                <TextField
-                  label="Brand"
-                  name="brand"
-                  value={cardData.brand || ""}
-                  onChange={(e) => setCardData({ ...cardData, brand: e.target.value })}
-                  fullWidth
-                  margin="normal"
-                />
-                <TextField
-                  label="Player"
-                  name="player"
-                  value={cardData.player || ""}
-                  onChange={(e) => setCardData({ ...cardData, player: e.target.value })}
-                  fullWidth
-                  margin="normal"
-                />
+                
+                {/* Editable fields */}
+                <TextField label="Label Type" name="label_type" value={cardData.label_type || ""} onChange={(e) => setCardData({ ...cardData, label_type: e.target.value })} fullWidth margin="normal" />
+                <TextField label="Year" name="year" value={cardData.year || ""} onChange={(e) => setCardData({ ...cardData, year: e.target.value })} fullWidth margin="normal" />
+                <TextField label="Brand" name="brand" value={cardData.brand || ""} onChange={(e) => setCardData({ ...cardData, brand: e.target.value })} fullWidth margin="normal" />
+                <TextField label="Player" name="player" value={cardData.player || ""} onChange={(e) => setCardData({ ...cardData, player: e.target.value })} fullWidth margin="normal" />
+                <TextField label="Sport" name="sport" value={cardData.sport || ""} onChange={(e) => setCardData({ ...cardData, sport: e.target.value })} fullWidth margin="normal" />
+                <TextField label="Card Number" name="card_number" value={cardData.card_number || ""} onChange={(e) => setCardData({ ...cardData, card_number: e.target.value })} fullWidth margin="normal" />
+                <TextField label="Grade" name="grade" value={cardData.grade || ""} onChange={(e) => setCardData({ ...cardData, grade: e.target.value })} fullWidth margin="normal" />
+                <TextField label="Grade Description" name="grade_description" value={cardData.grade_description || ""} onChange={(e) => setCardData({ ...cardData, grade_description: e.target.value })} fullWidth margin="normal" />
 
-                <Box mt={3}>
-                  <Typography>Front Image:</Typography>
-                  <Box {...getRootPropsFront()} sx={{ border: "1px dashed #ccc", padding: 2, textAlign: "center" }}>
-                    <input {...getInputPropsFront()} />
-                    {typeof imageFront === "string" ? (
-                      <img src={imageFront} alt="Front" style={{ width: "100%", maxHeight: 200 }} />
-                    ) : (
-                      <p>Drag 'n' drop to replace front image, or click to select</p>
-                    )}
+                {/* Image Uploads */}
+                <Box display="flex" justifyContent="space-between" mt={3}>
+                  <Box width="48%">
+                    <Typography>Front Image:</Typography>
+                    <Box {...getRootPropsFront()} sx={{ border: "1px dashed #ccc", padding: 1, textAlign: "center" }}>
+                      <input {...getInputPropsFront()} />
+                      {typeof imageFront === "string" ? (
+                        <img src={imageFront} alt="Front" style={{ width: "100%", maxHeight: 100, objectFit: "cover" }} />
+                      ) : (
+                        <p>Drag 'n' drop to replace front image, or click to select</p>
+                      )}
+                    </Box>
                   </Box>
 
-                  <Typography mt={2}>Back Image:</Typography>
-                  <Box {...getRootPropsBack()} sx={{ border: "1px dashed #ccc", padding: 2, textAlign: "center" }}>
-                    <input {...getInputPropsBack()} />
-                    {typeof imageBack === "string" ? (
-                      <img src={imageBack} alt="Back" style={{ width: "100%", maxHeight: 200 }} />
-                    ) : (
-                      <p>Drag 'n' drop to replace back image, or click to select</p>
-                    )}
+                  <Box width="48%">
+                    <Typography>Back Image:</Typography>
+                    <Box {...getRootPropsBack()} sx={{ border: "1px dashed #ccc", padding: 1, textAlign: "center" }}>
+                      <input {...getInputPropsBack()} />
+                      {typeof imageBack === "string" ? (
+                        <img src={imageBack} alt="Back" style={{ width: "100%", maxHeight: 100, objectFit: "cover" }} />
+                      ) : (
+                        <p>Drag 'n' drop to replace back image, or click to select</p>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
 
@@ -196,12 +175,7 @@ function CardEdit() {
       </Box>
 
       {/* Snackbar for notifications */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setOpenSnackbar(false)}
-        message={snackbarMessage}
-      />
+      <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={() => setOpenSnackbar(false)} message={snackbarMessage} />
 
       {/* Confirmation Dialog for Update */}
       <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)}>
