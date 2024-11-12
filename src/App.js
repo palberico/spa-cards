@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./components/Home";
+import CardDetail from "./components/CardDetail";
+import Admin from "./components/Admin";
+import Login from "./components/Login";
+import CardInput from "./components/CardInput";
+import CardEdit from "./components/CardEdit";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/card/:id" element={<CardDetail />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+        <Route path="/cardinput" element={<ProtectedRoute><CardInput /></ProtectedRoute>} />
+        <Route path="/cardedit" element={<ProtectedRoute><CardEdit /></ProtectedRoute>} />
+      </Routes>
+    </Router>
   );
 }
 
