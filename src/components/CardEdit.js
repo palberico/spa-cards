@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { db, storage } from "../firebase";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject, getDownloadURL, uploadBytes } from "firebase/storage";
@@ -16,7 +16,7 @@ function CardEdit() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   const handleSearch = async () => {
     if (searchId.trim()) {
