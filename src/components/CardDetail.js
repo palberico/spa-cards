@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { CardContent, Typography, Box, CardMedia } from "@mui/material";
+import {
+  Typography,
+  Box,
+  CardMedia,
+  Divider,
+  Paper,
+} from "@mui/material";
 import Header from "./Header"; // Import the Header component
 
 function CardDetail() {
@@ -28,23 +34,48 @@ function CardDetail() {
           display="flex"
           flexDirection="column"
           alignItems="center"
-          sx={{ padding: 2, width: "100%", maxWidth: 800, margin: "0 auto" }}
+          sx={{ padding: 4, width: "100%", maxWidth: 800, margin: "0 auto" }}
         >
-          <CardContent>
-            <Typography variant="h5" textAlign="center">{card.player}</Typography>
-            <Typography color="textSecondary" textAlign="center">
+          {/* Card Details Section */}
+          <Paper elevation={3} sx={{ width: "100%", padding: 3, marginBottom: 4 }}>
+            <Typography variant="h5" textAlign="center" gutterBottom>
+              {card.player}
+            </Typography>
+            <Typography variant="body1" textAlign="center" color="textSecondary" gutterBottom>
               SPA Certification Number: {id}
             </Typography>
-            {/* Add other card details here if needed */}
-          </CardContent>
 
-          {/* Display images side-by-side on larger screens and stack on smaller screens */}
+            <Divider sx={{ marginY: 2 }} />
+
+            <Box display="flex" flexDirection="column" gap={1} alignItems="center">
+              <Typography variant="body2" color="textSecondary">
+                <strong>Sport:</strong> {card.sport}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                <strong>Brand:</strong> {card.brand}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                <strong>Year:</strong> {card.year}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                <strong>Card Number:</strong> {card.card_number}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                <strong>Grade:</strong> {card.grade}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                <strong>Grade Description:</strong> {card.grade_description}
+              </Typography>
+            </Box>
+          </Paper>
+
+          {/* Display Images */}
           <Box
             display="flex"
             flexDirection={{ xs: "column", sm: "row" }}
             justifyContent="center"
             alignItems="center"
-            gap={2}
+            gap={3}
             width="100%"
           >
             <CardMedia
@@ -55,7 +86,8 @@ function CardDetail() {
                 width: { xs: "100%", sm: "45%" },
                 height: "auto",
                 maxWidth: 400,
-                objectFit: "contain",
+                borderRadius: 2,
+                boxShadow: 3,
               }}
             />
             <CardMedia
@@ -66,7 +98,8 @@ function CardDetail() {
                 width: { xs: "100%", sm: "45%" },
                 height: "auto",
                 maxWidth: 400,
-                objectFit: "contain",
+                borderRadius: 2,
+                boxShadow: 3,
               }}
             />
           </Box>
@@ -79,3 +112,4 @@ function CardDetail() {
 }
 
 export default CardDetail;
+
