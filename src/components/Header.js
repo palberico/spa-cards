@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppBar, Toolbar, Typography, TextField, Button, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, TextField, Button, Box, IconButton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 function Header() {
   const [searchId, setSearchId] = useState("");
@@ -22,21 +23,43 @@ function Header() {
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+    <AppBar position="fixed" sx={{ width: "100%" }}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: { xs: "center", sm: "space-between" },
+          flexWrap: { xs: "wrap", sm: "nowrap" },
+          paddingY: 1,
+        }}
+      >
         {/* Logo with left-click and right-click functionality */}
         <Typography
           variant="h4"
           fontWeight="bold"
           onClick={handleLogoClick}
           onContextMenu={handleLogoClick}
-          sx={{ cursor: "pointer" }}
+          sx={{
+            cursor: "pointer",
+            fontSize: { xs: "1.5rem", sm: "2rem" },
+            marginBottom: { xs: 0, sm: 0 },
+          }}
         >
           SPA
         </Typography>
 
         {/* Search Box */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: { xs: "wrap", sm: "nowrap" },
+            justifyContent: "center",
+            width: "100%",
+            maxWidth: 400, // Limit the width to avoid overflow
+            mt: { xs: 1, sm: 0 },
+          }}
+        >
           <TextField
             variant="outlined"
             placeholder="Enter Certificate Number"
@@ -46,12 +69,33 @@ function Header() {
             sx={{
               backgroundColor: "white",
               borderRadius: 1,
-              width: { xs: "110px", sm: "210px" },
+              width: { xs: "80%", sm: "210px" },
+              maxWidth: 300, // Ensure TextField doesn’t exceed the container width
             }}
           />
-          <Button variant="contained" color="secondary" onClick={handleSearch}>
-            Search
-          </Button>
+          <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <Button variant="contained" color="secondary" onClick={handleSearch}>
+              Search
+            </Button>
+          </Box>
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <IconButton
+              color="secondary"
+              onClick={handleSearch}
+              sx={{
+                backgroundColor: "white",
+                borderRadius: "50%",
+                padding: "5px", // Add padding for circular shape
+                boxShadow: 1,
+                color: "primary.main", // Change icon color
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.8)", // Slight hover effect
+                },
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
         </Box>
       </Toolbar>
     </AppBar>
