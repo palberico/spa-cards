@@ -62,7 +62,7 @@ function Home() {
       {/* Introductory Text */}
       <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Cert Verification
+          Certificate Verification
         </Typography>
         <Typography variant="body1" align="center" sx={{ maxWidth: 600, mb: 2 }}>
           Verify the validity of SPA certification numbers using the search field above, or filter
