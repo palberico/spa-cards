@@ -60,6 +60,8 @@ function Home() {
       <Header />
 
       {/* Introductory Text */}
+
+      <Box sx={{ pt: { xs: 8, sm: 10 } }}> 
       <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
           Certificate Verification
@@ -144,6 +146,7 @@ function Home() {
           />
         </Box>
       </TableContainer>
+      </Box>
     </div>
   );
 }
