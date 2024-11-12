@@ -64,7 +64,8 @@ function CardInput() {
         imageBack: backImageUrl,
       });
 
-      const cardUrl = `https://spacards.netlify.app/card/${newCardDocRef.id}`;
+      const baseUrl = "https://spacards.netlify.app"; 
+      const cardUrl = `${baseUrl}/card/${newCardDocRef.id}`;
       setQrCodeUrl(cardUrl);
       setCardDocRef(newCardDocRef);
 
