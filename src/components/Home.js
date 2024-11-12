@@ -11,7 +11,7 @@ import {
   Paper,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import Header from "./Header"; // Import the Header component
+import Header from "./Header";
 
 function Home() {
   const [cards, setCards] = useState([]);
@@ -34,18 +34,19 @@ function Home() {
 
   return (
     <div>
-      <Header /> {/* Include the Header component */}
-      {/* Remove the Typography "SPA" since it's now in the Header */}
+      <Header />
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell></TableCell> {/* Front Image Column */}
               <TableCell>Sport</TableCell>
               <TableCell>Player</TableCell>
               <TableCell>Year</TableCell>
               <TableCell>Brand</TableCell>
               <TableCell>Card Number</TableCell>
               <TableCell>Rating</TableCell>
+              <TableCell></TableCell> {/* QR Code Column */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -56,12 +57,30 @@ function Home() {
                 to={`/card/${card.id}`}
                 style={{ cursor: "pointer", textDecoration: "none" }}
               >
+                <TableCell>
+                  {card.imageFront && (
+                    <img
+                      src={card.imageFront}
+                      alt="Card Front"
+                      style={{ width: 50, height: 50, objectFit: "cover" }}
+                    />
+                  )}
+                </TableCell>
                 <TableCell>{card.sport}</TableCell>
                 <TableCell>{card.player}</TableCell>
                 <TableCell>{card.year}</TableCell>
                 <TableCell>{card.brand}</TableCell>
                 <TableCell>{card.card_number}</TableCell>
                 <TableCell>{card.grade}</TableCell>
+                <TableCell>
+                  {card.qr_code && (
+                    <img
+                      src={card.qr_code}
+                      alt="QR Code"
+                      style={{ width: 50, height: 50 }}
+                    />
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
