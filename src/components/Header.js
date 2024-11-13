@@ -23,7 +23,11 @@ function Header() {
   };
 
   return (
-    <AppBar position="fixed" sx={{ width: "100%" }}>
+    // Blue background
+    // <AppBar position="fixed" sx={{ width: "100%" }}> 
+
+    // White background
+    <AppBar position="fixed" sx={{ width: "100%", backgroundColor: "white", color: "black", boxShadow: "none" }}>
       <Toolbar
         sx={{
           display: "flex",
