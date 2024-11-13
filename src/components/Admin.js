@@ -2,11 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Box,
-  Button,
-  Card,
-  CardContent,
-  Typography,
-  Grid,
   Table,
   TableBody,
   TableCell,
@@ -22,16 +17,24 @@ import {
   DialogActions,
   Snackbar,
   Pagination,
+  Checkbox,
+  Tooltip,
+  Button,
+  Typography,
+  TextField,
 } from "@mui/material";
 import { db, storage } from "../firebase";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import AdminHeader from "./AdminHeader";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 function Admin() {
   const navigate = useNavigate();
   const [cards, setCards] = useState([]);
+  const [search, setSearch] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [cardToDelete, setCardToDelete] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -52,8 +55,8 @@ function Admin() {
     navigate("/cardinput");
   };
 
-  const goToCardEdit = () => {
-    navigate("/cardedit");
+  const goToCardEdit = (id) => {
+    navigate(`/cardedit/${id}`);
   };
 
   const handleDeleteClick = (id) => {
@@ -88,56 +91,68 @@ function Admin() {
     setCurrentPage(value);
   };
 
-  const paginatedCards = cards.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+  // Filter cards based on the search input
+  const filteredCards = cards.filter((card) =>
+    Object.values(card).some(
+      (value) =>
+        typeof value === "string" &&
+        value.toLowerCase().includes(search.toLowerCase())
+    )
+  );
+
+  const paginatedCards = filteredCards.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1); // Reset to the first page after each new search input
+  };
 
   return (
     <div>
       <AdminHeader />
       <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 4 }}>
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item>
-            <Card sx={{ maxWidth: 400, padding: 3, textAlign: "center" }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  Create New Card
-                </Typography>
-                <Button variant="contained" color="primary" onClick={goToCardInput}>
-                  Enter New Card
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item>
-            <Card sx={{ maxWidth: 400, padding: 3, textAlign: "center" }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  Edit or Delete Card
-                </Typography>
-                <Button variant="contained" color="secondary" onClick={goToCardEdit}>
-                  Edit Card
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        
+        {/* Search Field */}
+        <Box sx={{ width: "90%", mb: 3 }}>
+          <TextField
+            label="Search by any field (e.g., player, certificate number)"
+            variant="outlined"
+            fullWidth
+            value={search}
+            onChange={handleSearchChange}
+          />
+        </Box>
 
         {/* Table for Card List */}
-        <TableContainer component={Paper} sx={{ mt: 4, width: "90%" }}>
+        <TableContainer component={Paper} sx={{ width: "90%" }}>
           <Table>
             <TableHead>
-              <TableRow>
+              <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
+                <TableCell></TableCell> {/* Checkbox Column */}
                 <TableCell></TableCell> {/* Front Image Column */}
-                <TableCell>Cert #</TableCell>
+                <TableCell>Certificate Number</TableCell>
                 <TableCell>Sport</TableCell>
                 <TableCell>Year</TableCell>
                 <TableCell>Brand</TableCell>
                 <TableCell>Player</TableCell>
-                <TableCell />
+                <TableCell align="center">
+                  <Tooltip title="Add New Card" arrow>
+                    <IconButton onClick={goToCardInput}>
+                      <AddCircleIcon color="primary" fontSize="large" />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedCards.map((card) => (
                 <TableRow key={card.id}>
+                  <TableCell>
+                    <Checkbox />
+                  </TableCell>
                   <TableCell>
                     {card.imageFront ? (
                       <img
@@ -161,6 +176,9 @@ function Admin() {
                   <TableCell>{card.brand}</TableCell>
                   <TableCell>{card.player}</TableCell>
                   <TableCell>
+                    <IconButton onClick={() => goToCardEdit(card.id)}>
+                      <EditIcon color="primary" />
+                    </IconButton>
                     <IconButton onClick={() => handleDeleteClick(card.id)}>
                       <DeleteIcon color="error" />
                     </IconButton>
@@ -171,7 +189,7 @@ function Admin() {
           </Table>
           <Box display="flex" justifyContent="center" mt={2} mb={2}>
             <Pagination
-              count={Math.ceil(cards.length / rowsPerPage)}
+              count={Math.ceil(filteredCards.length / rowsPerPage)}
               page={currentPage}
               onChange={handlePageChange}
             />
