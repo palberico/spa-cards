@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppBar, Toolbar, Typography, TextField, Button, Box, IconButton } from "@mui/material";
+import { AppBar, Toolbar, TextField, Button, Box, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 function Header() {
@@ -33,19 +33,24 @@ function Header() {
         }}
       >
         {/* Logo with left-click and right-click functionality */}
-        <Typography
-          variant="h4"
-          fontWeight="bold"
+        <Box
           onClick={handleLogoClick}
           onContextMenu={handleLogoClick}
           sx={{
             cursor: "pointer",
-            fontSize: { xs: "1.5rem", sm: "2rem" },
-            marginBottom: { xs: 0, sm: 0 },
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          SPA
-        </Typography>
+          <img
+            src={`${process.env.PUBLIC_URL}/SPA Logo.svg`} // Link to the logo in the public folder
+            alt="SPA Logo"
+            style={{
+              height: "40px", // Adjust height as needed
+              width: "auto",
+            }}
+          />
+        </Box>
 
         {/* Search Box */}
         <Box
