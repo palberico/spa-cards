@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom"; 
 import { db, storage } from "../firebase";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject, getDownloadURL, uploadBytes } from "firebase/storage";
@@ -7,7 +8,8 @@ import { useDropzone } from "react-dropzone";
 import AdminHeader from "./AdminHeader";
 
 function CardEdit() {
-  const [searchId, setSearchId] = useState("");
+  const { id: cardId } = useParams();
+  const navigate = useNavigate();
   const [cardData, setCardData] = useState(null);
   const [imageFront, setImageFront] = useState(null);
   const [imageBack, setImageBack] = useState(null);
@@ -16,21 +18,24 @@ function CardEdit() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const handleSearch = async () => {
-    if (searchId.trim()) {
-      const cardRef = doc(db, "cards", searchId);
-      const cardSnap = await getDoc(cardRef);
-      if (cardSnap.exists()) {
-        setCardData(cardSnap.data());
-        setImageFront(cardSnap.data().imageFront);
-        setImageBack(cardSnap.data().imageBack);
-      } else {
-        setCardData(null);
-        setSnackbarMessage("Card not found.");
-        setOpenSnackbar(true);
+  useEffect(() => {
+    const fetchCardData = async () => {
+      if (cardId) {
+        const cardRef = doc(db, "cards", cardId);
+        const cardSnap = await getDoc(cardRef);
+        if (cardSnap.exists()) {
+          setCardData(cardSnap.data());
+          setImageFront(cardSnap.data().imageFront);
+          setImageBack(cardSnap.data().imageBack);
+        } else {
+          setSnackbarMessage("Card not found.");
+          setOpenSnackbar(true);
+          navigate("/admin");
+        }
       }
-    }
-  };
+    };
+    fetchCardData();
+  }, [cardId, navigate]);
 
   const handleUpdate = async () => {
     if (cardData) {
@@ -39,17 +44,16 @@ function CardEdit() {
   };
 
   const confirmUpdate = async () => {
-    const cardRef = doc(db, "cards", searchId);
+    const cardRef = doc(db, "cards", cardId);
     const updatedData = { ...cardData };
 
-    // Upload new images if changed
     if (imageFront instanceof File) {
-      const frontRef = ref(storage, `cards/${searchId}_front`);
+      const frontRef = ref(storage, `cards/${cardId}_front`);
       await uploadBytes(frontRef, imageFront);
       updatedData.imageFront = await getDownloadURL(frontRef);
     }
     if (imageBack instanceof File) {
-      const backRef = ref(storage, `cards/${searchId}_back`);
+      const backRef = ref(storage, `cards/${cardId}_back`);
       await uploadBytes(backRef, imageBack);
       updatedData.imageBack = await getDownloadURL(backRef);
     }
@@ -58,6 +62,7 @@ function CardEdit() {
     setSnackbarMessage("Card updated successfully.");
     setOpenSnackbar(true);
     setConfirmDialogOpen(false);
+    navigate("/admin"); // Redirect to Admin after update
   };
 
   const handleDelete = () => {
@@ -65,10 +70,10 @@ function CardEdit() {
   };
 
   const confirmDelete = async () => {
-    const cardRef = doc(db, "cards", searchId);
-    const frontRef = ref(storage, `cards/${searchId}_front`);
-    const backRef = ref(storage, `cards/${searchId}_back`);
-    const qrCodeRef = ref(storage, `qr_codes/${searchId}_qrCode.png`);
+    const cardRef = doc(db, "cards", cardId);
+    const frontRef = ref(storage, `cards/${cardId}_front`);
+    const backRef = ref(storage, `cards/${cardId}_back`);
+    const qrCodeRef = ref(storage, `qr_codes/${cardId}_qrCode.png`);
 
     await deleteDoc(cardRef);
     await Promise.all([
@@ -80,8 +85,11 @@ function CardEdit() {
     setSnackbarMessage("Card and associated data deleted successfully.");
     setOpenSnackbar(true);
     setDeleteDialogOpen(false);
-    setCardData(null);
-    setSearchId("");
+    navigate("/admin"); // Redirect to Admin after delete
+  };
+
+  const handleCancel = () => {
+    navigate("/admin"); // Navigate back to Admin screen on cancel
   };
 
   const handleImageChange = (file, type) => {
@@ -104,25 +112,11 @@ function CardEdit() {
     <div>
       <AdminHeader />
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: "80vh", flexDirection: "column" }}>
-        <Card sx={{ maxWidth: 600, padding: 3, overflow: "auto", maxHeight: "70vh" }}>
+        <Card sx={{ maxWidth: 1000, padding: 4, overflow: "auto", maxHeight: "70vh" }}>
           <CardContent>
-            <Typography variant="h5" gutterBottom>Edit or Delete Card</Typography>
-            <TextField
-              label="Enter Card Document ID"
-              variant="outlined"
-              fullWidth
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
-              sx={{ marginBottom: 2 }}
-            />
-            {!cardData && (
-              <Button variant="contained" color="primary" onClick={handleSearch}>
-                Search
-              </Button>
-            )}
-
+    
             {cardData && (
-              <Box mt={4}>
+              <Box>
                 <Typography variant="h6" gutterBottom>Edit Card Details</Typography>
                 
                 {/* Editable fields */}
@@ -162,12 +156,19 @@ function CardEdit() {
                   </Box>
                 </Box>
 
-                <Button variant="contained" color="secondary" onClick={handleUpdate} sx={{ mt: 3 }}>
-                  Update Card
-                </Button>
-                <Button variant="contained" color="error" onClick={handleDelete} sx={{ mt: 3, ml: 2 }}>
-                  Delete Card
-                </Button>
+                <Box display="flex" justifyContent="space-between" mt={3}>
+                  <Box>
+                    <Button variant="contained" color="secondary" onClick={handleUpdate}>
+                      Update Card
+                    </Button>
+                    <Button variant="contained" color="error" onClick={handleDelete} sx={{ ml: 2 }}>
+                      Delete Card
+                    </Button>
+                  </Box>
+                  <Button variant="outlined" color="primary" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </Box>
               </Box>
             )}
           </CardContent>

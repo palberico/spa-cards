@@ -17,7 +17,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/cardinput" element={<ProtectedRoute><CardInput /></ProtectedRoute>} />
-        <Route path="/cardedit" element={<ProtectedRoute><CardEdit /></ProtectedRoute>} />
+        <Route path="/cardedit/:id" element={<ProtectedRoute><CardEdit /></ProtectedRoute>} /> 
       </Routes>
     </Router>
   );
