@@ -60,92 +60,93 @@ function Home() {
       <Header />
 
       {/* Introductory Text */}
-
       <Box sx={{ pt: { xs: 10, sm: 10 } }}> 
-      <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Certificate Verification
-        </Typography>
-        <Typography variant="body1" align="center" sx={{ maxWidth: 600, mb: 2 }}>
-          Verify the validity of SPA certification numbers using the search field above, or filter
-          our database in the field below. Always confirm certification numbers for collectibles 
-          purchased online after receipt.
-        </Typography>
+        <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            Certificate Verification
+          </Typography>
+          <Typography variant="body1" align="center" sx={{ maxWidth: 600, mb: 2 }}>
+            Verify the validity of SPA certification numbers using the search field above, or filter
+            our database in the field below. Always confirm certification numbers for collectibles 
+            purchased online after receipt.
+          </Typography>
 
-        {/* Search Field */}
-        <TextField
-          label="Search by any field (e.g., player, certificate number)"
-          variant="outlined"
-          fullWidth
-          value={search}
-          onChange={handleSearchChange}
-          sx={{ maxWidth: 600, mb: 3 }}
-        />
-      </Box>
-
-      {/* Table with Cards */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell></TableCell> {/* Front Image Column */}
-              <TableCell>Certificate Number</TableCell>
-              <TableCell>Sport</TableCell>
-              <TableCell>Player</TableCell>
-              <TableCell>Year</TableCell>
-              <TableCell>Brand</TableCell>
-              <TableCell>Card Number</TableCell>
-              <TableCell>Rating</TableCell>
-              <TableCell></TableCell> {/* QR Code Column */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedCards.map((card) => (
-              <TableRow
-                key={card.id}
-                component={Link}
-                to={`/card/${card.id}`}
-                style={{ cursor: "pointer", textDecoration: "none" }}
-              >
-                <TableCell>
-                  {card.imageFront && (
-                    <img
-                      src={card.imageFront}
-                      alt="Card Front"
-                      style={{ width: 50, height: 50, objectFit: "cover" }}
-                    />
-                  )}
-                </TableCell>
-                <TableCell>{card.id}</TableCell>
-                <TableCell>{card.sport}</TableCell>
-                <TableCell>{card.player}</TableCell>
-                <TableCell>{card.year}</TableCell>
-                <TableCell>{card.brand}</TableCell>
-                <TableCell>{card.card_number}</TableCell>
-                <TableCell>{card.grade}</TableCell>
-                <TableCell>
-                  {card.qr_code && (
-                    <img
-                      src={card.qr_code}
-                      alt="QR Code"
-                      style={{ width: 50, height: 50 }}
-                    />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {/* Pagination */}
-        <Box display="flex" justifyContent="center" mt={2} mb={2}>
-          <Pagination
-            count={Math.ceil(filteredCards.length / rowsPerPage)}
-            page={currentPage}
-            onChange={handlePageChange}
+          {/* Search Field */}
+          <TextField
+            label="Search by any field (e.g., player, certificate number)"
+            variant="outlined"
+            fullWidth
+            value={search}
+            onChange={handleSearchChange}
+            sx={{ maxWidth: 600, mb: 3 }}
           />
         </Box>
-      </TableContainer>
+
+        {/* Centered Table with Cards */}
+        <Box display="flex" justifyContent="center" sx={{ width: '100%' }}>
+          <TableContainer component={Paper} sx={{ width: '90%', maxWidth: '100%' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell> {/* Front Image Column */}
+                  <TableCell>Certificate Number</TableCell>
+                  <TableCell>Sport</TableCell>
+                  <TableCell>Player</TableCell>
+                  <TableCell>Year</TableCell>
+                  <TableCell>Brand</TableCell>
+                  <TableCell>Card Number</TableCell>
+                  <TableCell>Rating</TableCell>
+                  <TableCell></TableCell> {/* QR Code Column */}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedCards.map((card) => (
+                  <TableRow
+                    key={card.id}
+                    component={Link}
+                    to={`/card/${card.id}`}
+                    style={{ cursor: "pointer", textDecoration: "none" }}
+                  >
+                    <TableCell>
+                      {card.imageFront && (
+                        <img
+                          src={card.imageFront}
+                          alt="Card Front"
+                          style={{ width: 50, height: 50, objectFit: "cover" }}
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell>{card.id}</TableCell>
+                    <TableCell>{card.sport}</TableCell>
+                    <TableCell>{card.player}</TableCell>
+                    <TableCell>{card.year}</TableCell>
+                    <TableCell>{card.brand}</TableCell>
+                    <TableCell>{card.card_number}</TableCell>
+                    <TableCell>{card.grade}</TableCell>
+                    <TableCell>
+                      {card.qr_code && (
+                        <img
+                          src={card.qr_code}
+                          alt="QR Code"
+                          style={{ width: 50, height: 50 }}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Pagination */}
+            <Box display="flex" justifyContent="center" mt={2} mb={2}>
+              <Pagination
+                count={Math.ceil(filteredCards.length / rowsPerPage)}
+                page={currentPage}
+                onChange={handlePageChange}
+              />
+            </Box>
+          </TableContainer>
+        </Box>
       </Box>
     </div>
   );
