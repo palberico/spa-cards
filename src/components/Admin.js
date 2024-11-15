@@ -148,7 +148,7 @@ function Admin() {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
-                <TableCell></TableCell>
+                <TableCell>Print</TableCell>
                 <TableCell></TableCell>
                 <TableCell>Certificate Number</TableCell>
                 <TableCell>Sport</TableCell>

@@ -69,7 +69,7 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
                   align-items: center;
                 }
                 #printLabel {
-                  width: 69.5mm;
+                  width: 68mm;
                   height: 20.5mm;
                   display: flex;
                   align-items: center;
@@ -82,7 +82,7 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
           </head>
           <body onload="window.print();window.close()">
             <div id="printLabel">
-              <img src="${imageData}" alt="Label" style="width: 69.5mm; height: 20.5mm;" />
+              <img src="${imageData}" alt="Label" style="width: 68mm; height: 20.5mm;" />
             </div>
           </body>
         </html>
@@ -111,7 +111,7 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
         <div
           ref={labelRef}
           style={{
-            width: "69.5mm",
+            width: "68mm",
             height: "20.5mm",
             display: "grid",
             gridTemplateColumns: "50% 50%",
