@@ -31,24 +31,65 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
     const documentId = cardDocRef.id;
 
     try {
-      // Capture the label as an image and upload it to Firebase Storage
       const canvas = await html2canvas(labelRef.current, { scale: 2, useCORS: true });
       const labelBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
       const labelStorageRef = ref(storage, `labels/${documentId}_label.png`);
       await uploadBytes(labelStorageRef, labelBlob);
       console.log(`Label image uploaded to: labels/${documentId}_label.png`);
 
-      // Capture the QR code as an image and upload it to Firebase Storage
       const qrCanvas = document.querySelector("canvas");
       const qrBlob = await new Promise((resolve) => qrCanvas.toBlob(resolve, "image/png"));
       const qrCodeStorageRef = ref(storage, `qr_codes/${documentId}_qrCode.png`);
       await uploadBytes(qrCodeStorageRef, qrBlob);
       console.log(`QR code image uploaded to: qr_codes/${documentId}_qrCode.png`);
 
-      // Trigger the onSaveComplete callback to notify CardInput of completion
       if (onSaveComplete) onSaveComplete();
     } catch (error) {
       console.error("Error saving label and QR code images:", error);
+    }
+  };
+
+  const handlePrintLabel = async () => {
+    try {
+      const canvas = await html2canvas(labelRef.current, { scale: 2, useCORS: true });
+      const imageData = canvas.toDataURL("image/png");
+      const printWindow = window.open("", "_blank", "width=800,height=600");
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Label</title>
+            <style>
+              @media print {
+                .no-print { display: none; }
+                body, html {
+                  margin: 0;
+                  padding: 0;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                }
+                #printLabel {
+                  width: 69.5mm;
+                  height: 20.5mm;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-sizing: border-box;
+                  padding: 8px;
+                }
+              }
+            </style>
+          </head>
+          <body onload="window.print();window.close()">
+            <div id="printLabel">
+              <img src="${imageData}" alt="Label" style="width: 69.5mm; height: 20.5mm;" />
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    } catch (error) {
+      console.error("Error printing the label:", error);
     }
   };
 
@@ -70,13 +111,13 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
         <div
           ref={labelRef}
           style={{
-            width: "67mm",
-            height: "25mm",
+            width: "69.5mm",
+            height: "20.5mm",
             display: "grid",
             gridTemplateColumns: "50% 50%",
             alignItems: "center",
             padding: "4px 8px",
-            border: "3px solid #0047ab",
+            border: "6.5px solid #0047ab",
             borderRadius: "4px",
             boxSizing: "border-box",
             backgroundColor: "white",
@@ -92,7 +133,6 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
 
           {/* Column 2: QR Code, Grade Image, and Document ID */}
           <Box display="grid" gridTemplateRows="75% 25%" alignItems="center" justifyContent="center" height="100%">
-            {/* Row 1: QR Code and Grade Image */}
             <Box display="grid" gridTemplateColumns="50% 50%" alignItems="center" justifyContent="center">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <QRCodeCanvas value={qrCodeUrl} size={36} />
@@ -115,12 +155,12 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
           </Box>
         </div>
 
-        {/* Save and Print Buttons */}
-        <Box display="flex" justifyContent="space-between" mt={2}>
+        {/* Save and Print Buttons - with "no-print" class */}
+        <Box display="flex" justifyContent="space-between" mt={2} className="no-print">
           <Button variant="contained" color="secondary" onClick={handleSaveLabelImage}>
             Save Label
           </Button>
-          <Button variant="contained" color="primary" onClick={() => window.print()}>
+          <Button variant="contained" color="primary" onClick={handlePrintLabel}>
             Print Label
           </Button>
         </Box>
@@ -130,4 +170,3 @@ function QrCodeLabelModal({ open, onClose, formData, qrCodeUrl, cardDocRef, onSa
 }
 
 export default QrCodeLabelModal;
-
