@@ -30,6 +30,7 @@ import AdminHeader from "./AdminHeader";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import MassPrintModal from "./MassPrintModal";
 
 function Admin() {
   const navigate = useNavigate();
@@ -39,6 +40,8 @@ function Admin() {
   const [cardToDelete, setCardToDelete] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [selectedCards, setSelectedCards] = useState([]);
+  const [openPrintModal, setOpenPrintModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
@@ -69,18 +72,35 @@ function Admin() {
     const frontRef = ref(storage, `cards/${cardToDelete}_front`);
     const backRef = ref(storage, `cards/${cardToDelete}_back`);
     const qrCodeRef = ref(storage, `qr_codes/${cardToDelete}_qrCode.png`);
+    const labelRef = ref(storage, `labels/${cardToDelete}_label.png`);
 
     await deleteDoc(cardRef);
     await Promise.all([
       deleteObject(frontRef).catch(() => {}),
       deleteObject(backRef).catch(() => {}),
       deleteObject(qrCodeRef).catch(() => {}),
+      deleteObject(labelRef).catch(() => {}),
     ]);
 
     setCards((prevCards) => prevCards.filter((card) => card.id !== cardToDelete));
     setSnackbarMessage("Card and associated data deleted successfully.");
     setOpenSnackbar(true);
     setDeleteDialogOpen(false);
+  };
+
+  const handleCheckboxChange = (id) => {
+    setSelectedCards((prev) =>
+      prev.includes(id) ? prev.filter((cardId) => cardId !== id) : [...prev, id]
+    );
+  };
+
+  const handlePrintLabels = () => {
+    if (selectedCards.length > 0) {
+      setOpenPrintModal(true);
+    } else {
+      setSnackbarMessage("No labels selected for printing.");
+      setOpenSnackbar(true);
+    }
   };
 
   const handleSnackbarClose = () => {
@@ -91,7 +111,11 @@ function Admin() {
     setCurrentPage(value);
   };
 
-  // Filter cards based on the search input
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);
+  };
+
   const filteredCards = cards.filter((card) =>
     Object.values(card).some(
       (value) =>
@@ -105,17 +129,11 @@ function Admin() {
     currentPage * rowsPerPage
   );
 
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
-    setCurrentPage(1); // Reset to the first page after each new search input
-  };
-
   return (
     <div>
       <AdminHeader />
       <Box display="flex" flexDirection="column" alignItems="center" sx={{ mt: 4 }}>
         
-        {/* Search Field */}
         <Box sx={{ width: "90%", mb: 3 }}>
           <TextField
             label="Search by any field (e.g., player, certificate number)"
@@ -126,13 +144,12 @@ function Admin() {
           />
         </Box>
 
-        {/* Table for Card List */}
         <TableContainer component={Paper} sx={{ width: "90%" }}>
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
-                <TableCell></TableCell> {/* Checkbox Column */}
-                <TableCell></TableCell> {/* Front Image Column */}
+                <TableCell></TableCell>
+                <TableCell></TableCell>
                 <TableCell>Certificate Number</TableCell>
                 <TableCell>Sport</TableCell>
                 <TableCell>Year</TableCell>
@@ -151,7 +168,10 @@ function Admin() {
               {paginatedCards.map((card) => (
                 <TableRow key={card.id}>
                   <TableCell>
-                    <Checkbox />
+                    <Checkbox
+                      checked={selectedCards.includes(card.id)}
+                      onChange={() => handleCheckboxChange(card.id)}
+                    />
                   </TableCell>
                   <TableCell>
                     {card.imageFront ? (
@@ -187,17 +207,22 @@ function Admin() {
               ))}
             </TableBody>
           </Table>
-          <Box display="flex" justifyContent="center" mt={2} mb={2}>
-            <Pagination
-              count={Math.ceil(filteredCards.length / rowsPerPage)}
-              page={currentPage}
-              onChange={handlePageChange}
-            />
-          </Box>
+          <Box display="flex" justifyContent="space-between" mt={2} mb={2}>
+  <Button variant="contained" onClick={handlePrintLabels} sx={{ ml: 2 }}> {/* Add margin-left */}
+    Print Labels
+  </Button>
+  <Box display="flex" justifyContent="right" flexGrow={1}> {/* Center the pagination */}
+    <Pagination
+      count={Math.ceil(filteredCards.length / rowsPerPage)}
+      page={currentPage}
+      onChange={handlePageChange}
+    />
+  </Box>
+
+</Box>
         </TableContainer>
       </Box>
 
-      {/* Confirmation Dialog for Delete */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
@@ -213,7 +238,14 @@ function Admin() {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for notifications */}
+      {openPrintModal && (
+        <MassPrintModal
+          open={openPrintModal}
+          onClose={() => setOpenPrintModal(false)}
+          selectedCards={selectedCards}
+        />
+      )}
+
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
