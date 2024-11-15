@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import AdminHeader from "./AdminHeader";
 import QrCodeLabelModal from "./QrCodeLabelModal";
+import BatchModal from "./BatchModal";
 
 function CardInput() {
   const [formData, setFormData] = useState({
@@ -31,6 +32,7 @@ function CardInput() {
     grade: "",
     grade_description: "",
   });
+  const [batchCount, setBatchCount] = useState(1); // New state for batch count
   const [frontImage, setFrontImage] = useState(null);
   const [backImage, setBackImage] = useState(null);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
@@ -38,6 +40,7 @@ function CardInput() {
   const [openModal, setOpenModal] = useState(false);
   const [cardDocRef, setCardDocRef] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [openBatchModal, setOpenBatchModal] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -111,15 +114,20 @@ function CardInput() {
     setQrCodeUrl("");
   };
 
+  const handleBatchComplete = () => {
+    setOpenBatchModal(false);
+    alert("Batch created successfully!");
+  };
+
   const sharedStyles = {
-    height: "56px", // Match the default TextField height
+    height: "56px",
     "& .MuiInputBase-root": {
-      height: "100%", // Ensure consistent height
-      boxSizing: "border-box", // Match TextField's padding behavior
+      height: "100%",
+      boxSizing: "border-box",
     },
     "& .MuiSelect-select": {
       display: "flex",
-      alignItems: "center", // Center-align text inside the dropdown
+      alignItems: "center",
     },
   };
 
@@ -233,12 +241,29 @@ function CardInput() {
               </Grid>
             </Grid>
 
-            <Box display="flex" justifyContent="flex-end" mt={2}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+              <Box display="flex" alignItems="center">
+                <TextField
+                  label="Batch Count"
+                  type="number"
+                  value={batchCount}
+                  onChange={(e) => setBatchCount(Math.max(0, parseInt(e.target.value || 0)))}
+                  sx={{ width: "120px", marginRight: 2 }}
+                />
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => setOpenBatchModal(true)}
+                  disabled={batchCount <= 1}
+                >
+                  Create Batch
+                </Button>
+              </Box>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={generateQRCode}
-                disabled={loading}
+                disabled={batchCount > 1 || loading}
               >
                 {loading ? <CircularProgress size={24} /> : "Generate QR Code"}
               </Button>
@@ -256,6 +281,14 @@ function CardInput() {
         onSaveComplete={handleSaveComplete}
       />
 
+      <BatchModal
+        open={openBatchModal}
+        onClose={() => setOpenBatchModal(false)}
+        formData={formData}
+        batchCount={batchCount} // Pass batchCount dynamically
+        onBatchComplete={handleBatchComplete}
+      />      
+
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
@@ -267,3 +300,4 @@ function CardInput() {
 }
 
 export default CardInput;
+
